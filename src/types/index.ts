@@ -53,9 +53,10 @@ export interface AudioMetering {
 
 export type PlaybackSpeed = 0.5 | 0.75 | 1.0 | 1.25 | 1.5 | 2.0;
 
-export interface NavigationParams {
+export type NavigationParams = {
   Home: undefined;
   RecordingsList: undefined;
   Playback: { recordingId: string };
   Settings: undefined;
-}
+  [key: string]: any;
+};

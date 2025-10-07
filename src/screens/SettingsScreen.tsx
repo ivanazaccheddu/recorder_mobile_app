@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { StyleSheet, ScrollView, Alert } from 'react-native';
 import {
   List,
   Switch,
   Button,
-  Divider,
   Text,
   Surface,
   RadioButton,

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { Text, IconButton, Surface, Chip, Menu } from 'react-native-paper';
-import { Slider } from '@react-native-community/slider';
+import Slider from '@react-native-community/slider';
 import { useAudioPlayer } from '../hooks/useAudioPlayer';
 import { useRecordings } from '../context/RecordingsContext';
 import { fileManager } from '../storage/fileManager';
@@ -46,7 +46,7 @@ export const PlaybackScreen: React.FC = () => {
     setRecording(currentRecording);
     
     if (currentRecording) {
-      loadSound(currentRecording.uri).catch((error) => {
+      loadSound(currentRecording.uri).catch(() => {
         Alert.alert('Error', 'Failed to load recording.');
       });
     }
@@ -54,6 +54,7 @@ export const PlaybackScreen: React.FC = () => {
     return () => {
       unload();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recordingId, recordings]);
 
   const handlePlayPause = async () => {

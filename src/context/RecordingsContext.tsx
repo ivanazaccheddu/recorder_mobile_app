@@ -25,6 +25,7 @@ export const RecordingsProvider: React.FC<{ children: ReactNode }> = ({ children
 
   useEffect(() => {
     initializeServices();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const initializeServices = async () => {

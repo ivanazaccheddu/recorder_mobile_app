@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['expo', 'prettier'],
+  extends: ['expo'],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
   rules: {

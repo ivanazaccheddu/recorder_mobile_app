@@ -7,7 +7,7 @@ class DatabaseService {
 
   async init(): Promise<void> {
     try {
-      this.db = await SQLite.openDatabaseAsync(DATABASE_NAME);
+      this.db = SQLite.openDatabase(DATABASE_NAME);
       await this.createTables();
     } catch (error) {
       console.error('Failed to initialize database:', error);
@@ -18,59 +18,93 @@ class DatabaseService {
   private async createTables(): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
-    await this.db.execAsync(`
-      CREATE TABLE IF NOT EXISTS recordings (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        uri TEXT NOT NULL,
-        duration INTEGER NOT NULL,
-        size INTEGER NOT NULL,
-        createdAt TEXT NOT NULL,
-        format TEXT NOT NULL,
-        category TEXT,
-        tags TEXT,
-        notes TEXT,
-        isFavorite INTEGER DEFAULT 0
+    return new Promise((resolve, reject) => {
+      this.db!.transaction(
+        (tx) => {
+          tx.executeSql(`
+            CREATE TABLE IF NOT EXISTS recordings (
+              id TEXT PRIMARY KEY,
+              title TEXT NOT NULL,
+              uri TEXT NOT NULL,
+              duration INTEGER NOT NULL,
+              size INTEGER NOT NULL,
+              createdAt TEXT NOT NULL,
+              format TEXT NOT NULL,
+              category TEXT,
+              tags TEXT,
+              notes TEXT,
+              isFavorite INTEGER DEFAULT 0
+            );
+          `);
+          tx.executeSql(`
+            CREATE INDEX IF NOT EXISTS idx_recordings_createdAt ON recordings(createdAt);
+          `);
+          tx.executeSql(`
+            CREATE INDEX IF NOT EXISTS idx_recordings_title ON recordings(title);
+          `);
+          tx.executeSql(`
+            CREATE INDEX IF NOT EXISTS idx_recordings_isFavorite ON recordings(isFavorite);
+          `);
+        },
+        (error) => reject(error),
+        () => resolve()
       );
-
-      CREATE INDEX IF NOT EXISTS idx_recordings_createdAt ON recordings(createdAt);
-      CREATE INDEX IF NOT EXISTS idx_recordings_title ON recordings(title);
-      CREATE INDEX IF NOT EXISTS idx_recordings_isFavorite ON recordings(isFavorite);
-    `);
+    });
   }
 
   async saveRecording(recording: Recording): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
-    await this.db.runAsync(
-      `INSERT OR REPLACE INTO recordings 
-       (id, title, uri, duration, size, createdAt, format, category, tags, notes, isFavorite) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        recording.id,
-        recording.title,
-        recording.uri,
-        recording.duration,
-        recording.size,
-        recording.createdAt,
-        recording.format,
-        recording.category || null,
-        recording.tags ? JSON.stringify(recording.tags) : null,
-        recording.notes || null,
-        recording.isFavorite ? 1 : 0,
-      ]
-    );
+    return new Promise((resolve, reject) => {
+      this.db!.transaction(
+        (tx) => {
+          tx.executeSql(
+            `INSERT OR REPLACE INTO recordings 
+             (id, title, uri, duration, size, createdAt, format, category, tags, notes, isFavorite) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+              recording.id,
+              recording.title,
+              recording.uri,
+              recording.duration,
+              recording.size,
+              recording.createdAt,
+              recording.format,
+              recording.category || null,
+              recording.tags ? JSON.stringify(recording.tags) : null,
+              recording.notes || null,
+              recording.isFavorite ? 1 : 0,
+            ]
+          );
+        },
+        (error) => reject(error),
+        () => resolve()
+      );
+    });
   }
 
   async getRecording(id: string): Promise<Recording | null> {
     if (!this.db) throw new Error('Database not initialized');
 
-    const result = await this.db.getFirstAsync<any>(
-      'SELECT * FROM recordings WHERE id = ?',
-      [id]
-    );
-
-    return result ? this.mapToRecording(result) : null;
+    return new Promise((resolve, reject) => {
+      this.db!.transaction((tx) => {
+        tx.executeSql(
+          'SELECT * FROM recordings WHERE id = ?',
+          [id],
+          (_, { rows }) => {
+            if (rows.length > 0) {
+              resolve(this.mapToRecording(rows.item(0)));
+            } else {
+              resolve(null);
+            }
+          },
+          (_, error) => {
+            reject(error);
+            return false;
+          }
+        );
+      });
+    });
   }
 
   async getAllRecordings(
@@ -89,43 +123,97 @@ class DatabaseService {
     const orderBy = orderByMap[sortBy];
     const order = sortOrder.toUpperCase();
 
-    const results = await this.db.getAllAsync<any>(
-      `SELECT * FROM recordings ORDER BY ${orderBy} ${order}`
-    );
-
-    return results.map(this.mapToRecording);
+    return new Promise((resolve, reject) => {
+      this.db!.transaction((tx) => {
+        tx.executeSql(
+          `SELECT * FROM recordings ORDER BY ${orderBy} ${order}`,
+          [],
+          (_, { rows }) => {
+            const recordings: Recording[] = [];
+            for (let i = 0; i < rows.length; i++) {
+              recordings.push(this.mapToRecording(rows.item(i)));
+            }
+            resolve(recordings);
+          },
+          (_, error) => {
+            reject(error);
+            return false;
+          }
+        );
+      });
+    });
   }
 
   async searchRecordings(query: string): Promise<Recording[]> {
     if (!this.db) throw new Error('Database not initialized');
 
-    const results = await this.db.getAllAsync<any>(
-      'SELECT * FROM recordings WHERE title LIKE ? OR notes LIKE ? ORDER BY createdAt DESC',
-      [`%${query}%`, `%${query}%`]
-    );
-
-    return results.map(this.mapToRecording);
+    return new Promise((resolve, reject) => {
+      this.db!.transaction((tx) => {
+        tx.executeSql(
+          'SELECT * FROM recordings WHERE title LIKE ? OR notes LIKE ? ORDER BY createdAt DESC',
+          [`%${query}%`, `%${query}%`],
+          (_, { rows }) => {
+            const recordings: Recording[] = [];
+            for (let i = 0; i < rows.length; i++) {
+              recordings.push(this.mapToRecording(rows.item(i)));
+            }
+            resolve(recordings);
+          },
+          (_, error) => {
+            reject(error);
+            return false;
+          }
+        );
+      });
+    });
   }
 
   async getRecordingsByCategory(category: string): Promise<Recording[]> {
     if (!this.db) throw new Error('Database not initialized');
 
-    const results = await this.db.getAllAsync<any>(
-      'SELECT * FROM recordings WHERE category = ? ORDER BY createdAt DESC',
-      [category]
-    );
-
-    return results.map(this.mapToRecording);
+    return new Promise((resolve, reject) => {
+      this.db!.transaction((tx) => {
+        tx.executeSql(
+          'SELECT * FROM recordings WHERE category = ? ORDER BY createdAt DESC',
+          [category],
+          (_, { rows }) => {
+            const recordings: Recording[] = [];
+            for (let i = 0; i < rows.length; i++) {
+              recordings.push(this.mapToRecording(rows.item(i)));
+            }
+            resolve(recordings);
+          },
+          (_, error) => {
+            reject(error);
+            return false;
+          }
+        );
+      });
+    });
   }
 
   async getFavoriteRecordings(): Promise<Recording[]> {
     if (!this.db) throw new Error('Database not initialized');
 
-    const results = await this.db.getAllAsync<any>(
-      'SELECT * FROM recordings WHERE isFavorite = 1 ORDER BY createdAt DESC'
-    );
-
-    return results.map(this.mapToRecording);
+    return new Promise((resolve, reject) => {
+      this.db!.transaction((tx) => {
+        tx.executeSql(
+          'SELECT * FROM recordings WHERE isFavorite = 1 ORDER BY createdAt DESC',
+          [],
+          (_, { rows }) => {
+            const recordings: Recording[] = [];
+            for (let i = 0; i < rows.length; i++) {
+              recordings.push(this.mapToRecording(rows.item(i)));
+            }
+            resolve(recordings);
+          },
+          (_, error) => {
+            reject(error);
+            return false;
+          }
+        );
+      });
+    });
   }
 
   async updateRecording(recording: Partial<Recording> & { id: string }): Promise<void> {
@@ -159,36 +247,75 @@ class DatabaseService {
 
     values.push(recording.id);
 
-    await this.db.runAsync(
-      `UPDATE recordings SET ${fields.join(', ')} WHERE id = ?`,
-      values
-    );
+    return new Promise((resolve, reject) => {
+      this.db!.transaction(
+        (tx) => {
+          tx.executeSql(
+            `UPDATE recordings SET ${fields.join(', ')} WHERE id = ?`,
+            values
+          );
+        },
+        (error) => reject(error),
+        () => resolve()
+      );
+    });
   }
 
   async deleteRecording(id: string): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
-    await this.db.runAsync('DELETE FROM recordings WHERE id = ?', [id]);
+    return new Promise((resolve, reject) => {
+      this.db!.transaction(
+        (tx) => {
+          tx.executeSql('DELETE FROM recordings WHERE id = ?', [id]);
+        },
+        (error) => reject(error),
+        () => resolve()
+      );
+    });
   }
 
   async deleteMultipleRecordings(ids: string[]): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
     const placeholders = ids.map(() => '?').join(',');
-    await this.db.runAsync(
-      `DELETE FROM recordings WHERE id IN (${placeholders})`,
-      ids
-    );
+
+    return new Promise((resolve, reject) => {
+      this.db!.transaction(
+        (tx) => {
+          tx.executeSql(
+            `DELETE FROM recordings WHERE id IN (${placeholders})`,
+            ids
+          );
+        },
+        (error) => reject(error),
+        () => resolve()
+      );
+    });
   }
 
   async getCategories(): Promise<string[]> {
     if (!this.db) throw new Error('Database not initialized');
 
-    const results = await this.db.getAllAsync<{ category: string }>(
-      'SELECT DISTINCT category FROM recordings WHERE category IS NOT NULL ORDER BY category'
-    );
-
-    return results.map(r => r.category);
+    return new Promise((resolve, reject) => {
+      this.db!.transaction((tx) => {
+        tx.executeSql(
+          'SELECT DISTINCT category FROM recordings WHERE category IS NOT NULL ORDER BY category',
+          [],
+          (_, { rows }) => {
+            const categories: string[] = [];
+            for (let i = 0; i < rows.length; i++) {
+              categories.push(rows.item(i).category);
+            }
+            resolve(categories);
+          },
+          (_, error) => {
+            reject(error);
+            return false;
+          }
+        );
+      });
+    });
   }
 
   async getStatistics(): Promise<{
@@ -198,15 +325,26 @@ class DatabaseService {
   }> {
     if (!this.db) throw new Error('Database not initialized');
 
-    const result = await this.db.getFirstAsync<any>(
-      'SELECT COUNT(*) as count, SUM(duration) as duration, SUM(size) as size FROM recordings'
-    );
-
-    return {
-      totalRecordings: result?.count || 0,
-      totalDuration: result?.duration || 0,
-      totalSize: result?.size || 0,
-    };
+    return new Promise((resolve, reject) => {
+      this.db!.transaction((tx) => {
+        tx.executeSql(
+          'SELECT COUNT(*) as count, SUM(duration) as duration, SUM(size) as size FROM recordings',
+          [],
+          (_, { rows }) => {
+            const result = rows.item(0);
+            resolve({
+              totalRecordings: result?.count || 0,
+              totalDuration: result?.duration || 0,
+              totalSize: result?.size || 0,
+            });
+          },
+          (_, error) => {
+            reject(error);
+            return false;
+          }
+        );
+      });
+    });
   }
 
   private mapToRecording(row: any): Recording {
@@ -226,10 +364,8 @@ class DatabaseService {
   }
 
   async close(): Promise<void> {
-    if (this.db) {
-      await this.db.closeAsync();
-      this.db = null;
-    }
+    // SQLite.openDatabase doesn't provide a close method in Expo SDK
+    this.db = null;
   }
 }
 
