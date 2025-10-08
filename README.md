@@ -253,6 +253,69 @@ npx expo run:ios --configuration Release
 npx expo run:android --variant release
 ```
 
+## 🔄 Continuous Integration (CI/CD)
+
+### GitHub Actions Workflow
+
+The repository includes an automated build workflow (`.github/workflows/android-build.yml`) that:
+
+- ✅ Runs type checking with TypeScript
+- ✅ Executes all tests
+- ✅ Performs code linting
+- ✅ Builds Android APK automatically
+- ✅ Uploads APK as a downloadable artifact
+
+### When Builds Are Triggered
+
+The workflow automatically runs on:
+
+- **Pushes to `main` or `develop` branches**
+- **Pull requests to `main` or `develop` branches**
+- **Git tags** (e.g., `v1.0.0`, `v1.0.1`)
+- **Manual trigger** via GitHub Actions UI
+
+### How to Download Build Artifacts
+
+1. Go to the **Actions** tab in the GitHub repository
+2. Click on the workflow run you're interested in
+3. Scroll to the **Artifacts** section at the bottom
+4. Download the `app-debug` artifact (APK file)
+5. Extract the ZIP file to get the APK
+
+### Installing the APK on Android
+
+1. Download the APK artifact from GitHub Actions
+2. Extract the ZIP file to get `app-debug.apk`
+3. Transfer the APK to your Android device
+4. Enable **Install from Unknown Sources** in device settings
+5. Tap the APK file to install
+6. Grant permissions when prompted
+
+### Manual Build Trigger
+
+To manually trigger a build:
+
+1. Go to **Actions** tab in GitHub
+2. Select **Android Build** workflow
+3. Click **Run workflow** button
+4. Select the branch to build
+5. Click **Run workflow** to start
+
+### Local Android Build
+
+To build locally without GitHub Actions:
+
+```bash
+# Generate native Android project
+npx expo prebuild --platform android --clean
+
+# Build debug APK
+cd android
+./gradlew assembleDebug
+
+# APK location: android/app/build/outputs/apk/debug/app-debug.apk
+```
+
 ## 🧪 Testing
 
 ### Running Tests
