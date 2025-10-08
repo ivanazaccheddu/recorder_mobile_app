@@ -2,9 +2,9 @@
 
 A full-featured, offline-first mobile audio recording application built with React Native and Expo. Record, manage, and play back high-quality audio recordings entirely offline with an intuitive and modern interface.
 
-[![Expo](https://img.shields.io/badge/Expo-SDK%2050+-000020.svg?style=flat&logo=expo)](https://expo.dev/)
-[![React Native](https://img.shields.io/badge/React%20Native-0.73+-61DAFB.svg?style=flat&logo=react)](https://reactnative.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6.svg?style=flat&logo=typescript)](https://www.typescriptlang.org/)
+[![Expo](https://img.shields.io/badge/Expo-SDK%2051-000020.svg?style=flat&logo=expo)](https://expo.dev/)
+[![React Native](https://img.shields.io/badge/React%20Native-0.74-61DAFB.svg?style=flat&logo=react)](https://reactnative.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3+-3178C6.svg?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 
 ## ✨ Features
 
