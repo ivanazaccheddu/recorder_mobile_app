@@ -2,8 +2,8 @@
 
 A full-featured, offline-first mobile audio recording application built with React Native and Expo. Record, manage, and play back high-quality audio recordings entirely offline with an intuitive and modern interface.
 
-[![Expo](https://img.shields.io/badge/Expo-SDK%2051-000020.svg?style=flat&logo=expo)](https://expo.dev/)
-[![React Native](https://img.shields.io/badge/React%20Native-0.74-61DAFB.svg?style=flat&logo=react)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo-SDK%2054-000020.svg?style=flat&logo=expo)](https://expo.dev/)
+[![React Native](https://img.shields.io/badge/React%20Native-0.81-61DAFB.svg?style=flat&logo=react)](https://reactnative.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3+-3178C6.svg?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 
 ## ✨ Features
@@ -279,17 +279,19 @@ The workflow automatically runs on:
 1. Go to the **Actions** tab in the GitHub repository
 2. Click on the workflow run you're interested in
 3. Scroll to the **Artifacts** section at the bottom
-4. Download the `app-debug` artifact (APK file)
-5. Extract the ZIP file to get the APK
+4. Download the `app-release` artifact (APK file)
+5. Extract the ZIP file to get the release APK
 
 ### Installing the APK on Android
 
 1. Download the APK artifact from GitHub Actions
-2. Extract the ZIP file to get `app-debug.apk`
+2. Extract the ZIP file to get `app-release-unsigned.apk`
 3. Transfer the APK to your Android device
 4. Enable **Install from Unknown Sources** in device settings
 5. Tap the APK file to install
 6. Grant permissions when prompted
+
+**Note:** The release APK is unsigned. For distribution, you'll need to sign it with your keystore.
 
 ### Manual Build Trigger
 
@@ -309,10 +311,14 @@ To build locally without GitHub Actions:
 # Generate native Android project
 npx expo prebuild --platform android --clean
 
-# Build debug APK
+# Build release APK
 cd android
-./gradlew assembleDebug
+./gradlew assembleRelease
 
+# APK location: android/app/build/outputs/apk/release/app-release-unsigned.apk
+
+# Or build debug APK for testing
+./gradlew assembleDebug
 # APK location: android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
