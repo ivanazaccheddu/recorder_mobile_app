@@ -1,4 +1,4 @@
-# Testing Guide for SDK 51 Update
+# Testing Guide for SDK 54 Update
 
 ## Quick Start
 
@@ -63,8 +63,8 @@ The real test is in GitHub Actions:
 
 3. **Download and test the APK**:
    - Scroll to the bottom of the workflow run
-   - Download the `app-debug` artifact
-   - Extract the ZIP to get `app-debug.apk`
+   - Download the `app-release` artifact
+   - Extract the ZIP to get `app-release-unsigned.apk`
    - Install on an Android device/emulator
    - Test basic functionality:
      - Record an audio file
@@ -79,10 +79,11 @@ The real test is in GitHub Actions:
 - All features work as before
 
 ### For Developers
-- Expo SDK 51 (was SDK 50)
-- React Native 0.74 (was 0.73)
-- Modern async/await database API
-- Updated build tools (Gradle 8.8, AGP 8.2.1)
+- Expo SDK 54 (was SDK 51)
+- React 19 (was React 18)
+- React Native 0.81 (was 0.74)
+- Production builds in CI/CD (was debug builds)
+- Legacy expo-file-system API for compatibility
 
 ## Troubleshooting
 
@@ -153,7 +154,8 @@ If issues occur after merging:
 
 ## Questions?
 
-- Check `UPGRADE_TO_SDK51.md` for detailed migration info
+- Check `UPGRADE_TO_SDK54.md` for detailed migration info
+- Check `UPGRADE_TO_SDK51.md` for previous SDK upgrade
 - Check `BUILD_FIX_SUMMARY.md` for quick reference
 - Review the original issue for context
 

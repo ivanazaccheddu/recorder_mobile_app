@@ -60,14 +60,14 @@ const rows = await db.getAllAsync('SELECT * FROM table');
 - Prebuild: `npx expo prebuild --platform android` ✓
 
 ## GitHub Actions Impact
-The workflow file (`.github/workflows/android-build.yml`) requires **no changes**. It will:
+The workflow has been updated to build production releases:
 1. Install updated dependencies via `npm ci`
 2. Pass all quality checks (type-check, tests, lint)
 3. Generate Android project with `npx expo prebuild`
-4. Successfully build APK with `./gradlew assembleDebug`
+4. Build release APK with `./gradlew assembleRelease`
 
 ## Expected Outcome
-The Android build will now complete successfully, producing a debug APK that can be downloaded as a GitHub Actions artifact.
+The Android build will now complete successfully, producing a release APK (unsigned) that can be downloaded as a GitHub Actions artifact named `app-release`.
 
 ## Breaking Changes
 Only one breaking change affects the codebase:
@@ -82,7 +82,20 @@ For developers pulling this update:
 3. Delete `android/` and `ios/` directories (they're regenerated)
 4. Run `npx expo prebuild` if testing locally
 
+## Latest Update: SDK 54
+
+The project has been further upgraded to Expo SDK 54 (January 2025) with additional improvements:
+- **Expo SDK**: 51.0.39 → 54.0.12
+- **React**: 18.2.0 → 19.1.0
+- **React Native**: 0.74.5 → 0.81.4
+- **CI/CD**: Now builds release APKs instead of debug builds
+
+See `UPGRADE_TO_SDK54.md` for details on the latest upgrade.
+
 ## References
-- See `UPGRADE_TO_SDK51.md` for detailed upgrade guide
+- See `UPGRADE_TO_SDK54.md` for SDK 54 upgrade details
+- See `UPGRADE_TO_SDK51.md` for SDK 51 upgrade details
+- [Expo SDK 54 Release](https://blog.expo.dev/expo-sdk-54-c66d12df2f75)
 - [Expo SDK 51 Release](https://blog.expo.dev/expo-sdk-51-7e00e48d9a57)
+- [React Native 0.81 Release](https://reactnative.dev/blog/2025/01/07/release-0.81)
 - [React Native 0.74 Release](https://reactnative.dev/blog/2024/04/22/release-0.74)

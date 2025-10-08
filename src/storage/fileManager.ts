@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { StorageInfo } from '../types';
 import { LOW_STORAGE_THRESHOLD } from '../constants';
 
