@@ -58,12 +58,9 @@ coverage/
 .jest/
 
 # Build artifacts
-android/app/build/
-android/app/.cxx/
-android/.gradle/
-android/gradle/
-ios/Pods/
-ios/build/
+# Expo generates android/ and ios/ directories when running prebuild
+android/
+ios/
 *.xcworkspace
 !default.xcworkspace
 
