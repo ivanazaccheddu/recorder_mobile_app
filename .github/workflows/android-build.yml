@@ -58,6 +58,17 @@ jobs:
       - name: Make Gradlew executable
         run: chmod +x android/gradlew
 
+      - name: Create assets directory
+        run: mkdir -p android/app/src/main/assets
+
+      - name: Generate JS bundle and assets
+        run: |
+          npx expo export:embed \
+            --platform android \
+            --dev false \
+            --bundle-output android/app/src/main/assets/index.android.bundle \
+            --assets-dest android/app/src/main/res
+
       - name: Build Android APK (Release)
         working-directory: android
         run: ./gradlew assembleRelease --no-daemon
