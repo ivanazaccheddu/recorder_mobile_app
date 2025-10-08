@@ -10,7 +10,7 @@ export const useAudioRecorder = () => {
   const [metering, setMetering] = useState<number>(0);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
 
     if (isRecording && !isPaused) {
       interval = setInterval(async () => {
