@@ -311,16 +311,28 @@ To build locally without GitHub Actions:
 # Generate native Android project
 npx expo prebuild --platform android --clean
 
+# Create assets directory
+mkdir -p android/app/src/main/assets
+
+# Generate JS bundle and assets (for release builds)
+npx expo export:embed \
+  --platform android \
+  --dev false \
+  --bundle-output android/app/src/main/assets/index.android.bundle \
+  --assets-dest android/app/src/main/res
+
 # Build release APK
 cd android
 ./gradlew assembleRelease
 
 # APK location: android/app/build/outputs/apk/release/app-release-unsigned.apk
 
-# Or build debug APK for testing
+# Or build debug APK for testing (bundle generation not required)
 ./gradlew assembleDebug
 # APK location: android/app/build/outputs/apk/debug/app-debug.apk
 ```
+
+**Note:** For release builds, the JS bundle must be generated before running `assembleRelease` to ensure the app can run standalone without the Metro development server.
 
 ## 🧪 Testing
 

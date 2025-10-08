@@ -119,6 +119,17 @@ The workflow now builds a **release APK** instead of a debug APK:
 
 **After:**
 ```yaml
+- name: Create assets directory
+  run: mkdir -p android/app/src/main/assets
+
+- name: Generate JS bundle and assets
+  run: |
+    npx expo export:embed \
+      --platform android \
+      --dev false \
+      --bundle-output android/app/src/main/assets/index.android.bundle \
+      --assets-dest android/app/src/main/res
+
 - name: Build Android APK (Release)
   run: ./gradlew assembleRelease
 - name: Upload APK artifact
@@ -126,6 +137,11 @@ The workflow now builds a **release APK** instead of a debug APK:
     name: app-release
     path: android/app/build/outputs/apk/release/app-release-unsigned.apk
 ```
+
+**Important:** The workflow now includes an explicit JS bundle generation step before building the APK. This ensures:
+- The JavaScript bundle (`index.android.bundle`) is packaged into the APK
+- The app can run standalone without requiring a Metro development server
+- All assets are properly included in the release build
 
 **Note:** The release APK is unsigned. For production distribution to Play Store, you'll need to:
 1. Set up a keystore for signing
