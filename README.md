@@ -262,8 +262,16 @@ The repository includes an automated build workflow (`.github/workflows/android-
 - ✅ Runs type checking with TypeScript
 - ✅ Executes all tests
 - ✅ Performs code linting
-- ✅ Builds Android APK automatically
+- ✅ Generates JavaScript bundle with verification
+- ✅ Builds Android APK automatically with error checking
+- ✅ Verifies APK was created successfully
 - ✅ Uploads APK as a downloadable artifact
+
+The workflow includes verification steps to ensure:
+- JavaScript bundle is created before building
+- Gradle build completes successfully
+- APK file exists at the expected location
+- Build failures are caught with detailed error messages
 
 ### When Builds Are Triggered
 
