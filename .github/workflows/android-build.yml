@@ -63,22 +63,58 @@ jobs:
 
       - name: Generate JS bundle and assets
         run: |
+          echo "Generating JavaScript bundle..."
           npx expo export:embed \
             --platform android \
             --dev false \
             --bundle-output android/app/src/main/assets/index.android.bundle \
             --assets-dest android/app/src/main/res
+          
+          echo "Verifying bundle was created..."
+          if [ -f "android/app/src/main/assets/index.android.bundle" ]; then
+            echo "✅ JavaScript bundle created successfully"
+            ls -lh android/app/src/main/assets/index.android.bundle
+          else
+            echo "❌ Failed to create JavaScript bundle"
+            exit 1
+          fi
 
       - name: Build Android APK (Release)
         working-directory: android
-        run: ./gradlew assembleRelease --no-daemon
+        run: |
+          echo "Building release APK..."
+          ./gradlew assembleRelease --no-daemon --stacktrace
+          
+          BUILD_EXIT_CODE=$?
+          if [ $BUILD_EXIT_CODE -ne 0 ]; then
+            echo "❌ Gradle build failed with exit code $BUILD_EXIT_CODE"
+            exit $BUILD_EXIT_CODE
+          fi
+          echo "✅ Gradle build completed successfully"
+
+      - name: Verify APK was created
+        run: |
+          echo "Checking for APK file..."
+          if [ -f "android/app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+            echo "✅ APK file found"
+            ls -lh android/app/build/outputs/apk/release/app-release-unsigned.apk
+          else
+            echo "❌ APK file not found"
+            echo "Listing build output directory:"
+            ls -la android/app/build/outputs/apk/release/ || echo "Release directory does not exist"
+            echo "Listing all APK files in build directory:"
+            find android/app/build/outputs -name "*.apk" -type f || echo "No APK files found"
+            exit 1
+          fi
 
       - name: Upload APK artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: app-release
           path: android/app/build/outputs/apk/release/app-release-unsigned.apk
           retention-days: 30
+          if-no-files-found: error
 
       - name: Upload build summary
         if: always()
