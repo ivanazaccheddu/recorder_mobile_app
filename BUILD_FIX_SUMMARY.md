@@ -64,7 +64,8 @@ The workflow has been updated to build production releases:
 1. Install updated dependencies via `npm ci`
 2. Pass all quality checks (type-check, tests, lint)
 3. Generate Android project with `npx expo prebuild`
-4. Build release APK with `./gradlew assembleRelease`
+4. Generate JS bundle and assets with `npx expo export:embed`
+5. Build release APK with `./gradlew assembleRelease`
 
 ## Expected Outcome
 The Android build will now complete successfully, producing a release APK (unsigned) that can be downloaded as a GitHub Actions artifact named `app-release`.
