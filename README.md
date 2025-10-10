@@ -293,7 +293,7 @@ The workflow automatically runs on:
 ### Installing the APK on Android
 
 1. Download the APK artifact from GitHub Actions
-2. Extract the ZIP file to get `app-release-unsigned.apk`
+2. Extract the ZIP file to get `app-release.apk`
 3. Transfer the APK to your Android device
 4. Enable **Install from Unknown Sources** in device settings
 5. Tap the APK file to install
@@ -333,7 +333,7 @@ npx expo export:embed \
 cd android
 ./gradlew assembleRelease
 
-# APK location: android/app/build/outputs/apk/release/app-release-unsigned.apk
+# APK location: android/app/build/outputs/apk/release/app-release.apk
 
 # Or build debug APK for testing (bundle generation not required)
 ./gradlew assembleDebug

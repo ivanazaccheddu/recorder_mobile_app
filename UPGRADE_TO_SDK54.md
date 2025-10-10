@@ -145,7 +145,7 @@ The workflow now builds a **release APK** instead of a debug APK:
 
 - name: Verify APK was created
   run: |
-    if [ -f "android/app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+    if [ -f "android/app/build/outputs/apk/release/app-release.apk" ]; then
       echo "✅ APK file found"
     else
       echo "❌ APK file not found"
@@ -156,7 +156,7 @@ The workflow now builds a **release APK** instead of a debug APK:
   if: success()
   with:
     name: app-release
-    path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+    path: android/app/build/outputs/apk/release/app-release.apk
     if-no-files-found: error
 ```
 
