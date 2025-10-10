@@ -124,24 +124,53 @@ The workflow now builds a **release APK** instead of a debug APK:
 
 - name: Generate JS bundle and assets
   run: |
+    echo "Generating JavaScript bundle..."
     npx expo export:embed \
       --platform android \
       --dev false \
       --bundle-output android/app/src/main/assets/index.android.bundle \
       --assets-dest android/app/src/main/res
+    
+    # Verify bundle was created
+    if [ -f "android/app/src/main/assets/index.android.bundle" ]; then
+      echo "✅ JavaScript bundle created successfully"
+    else
+      exit 1
+    fi
 
 - name: Build Android APK (Release)
-  run: ./gradlew assembleRelease
+  working-directory: android
+  run: |
+    ./gradlew assembleRelease --no-daemon --stacktrace
+
+- name: Verify APK was created
+  run: |
+    if [ -f "android/app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+      echo "✅ APK file found"
+    else
+      echo "❌ APK file not found"
+      exit 1
+    fi
+
 - name: Upload APK artifact
+  if: success()
   with:
     name: app-release
     path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+    if-no-files-found: error
 ```
 
-**Important:** The workflow now includes an explicit JS bundle generation step before building the APK. This ensures:
+**Important:** The workflow now includes:
+- Explicit JS bundle generation step before building the APK
+- Verification steps to ensure bundle and APK are created successfully
+- Better error handling with --stacktrace flag for debugging
+- Automatic failure if any step doesn't produce expected output
+
+This ensures:
 - The JavaScript bundle (`index.android.bundle`) is packaged into the APK
 - The app can run standalone without requiring a Metro development server
 - All assets are properly included in the release build
+- Build failures are caught early with clear error messages
 
 **Note:** The release APK is unsigned. For production distribution to Play Store, you'll need to:
 1. Set up a keystore for signing

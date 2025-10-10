@@ -33,15 +33,49 @@ Added explicit JS bundle generation steps to the GitHub Actions workflow **befor
 
 - name: Generate JS bundle and assets
   run: |
+    echo "Generating JavaScript bundle..."
     npx expo export:embed \
       --platform android \
       --dev false \
       --bundle-output android/app/src/main/assets/index.android.bundle \
       --assets-dest android/app/src/main/res
+    
+    echo "Verifying bundle was created..."
+    if [ -f "android/app/src/main/assets/index.android.bundle" ]; then
+      echo "✅ JavaScript bundle created successfully"
+      ls -lh android/app/src/main/assets/index.android.bundle
+    else
+      echo "❌ Failed to create JavaScript bundle"
+      exit 1
+    fi
 
 - name: Build Android APK (Release)
   working-directory: android
-  run: ./gradlew assembleRelease --no-daemon
+  run: |
+    echo "Building release APK..."
+    ./gradlew assembleRelease --no-daemon --stacktrace
+    
+    BUILD_EXIT_CODE=$?
+    if [ $BUILD_EXIT_CODE -ne 0 ]; then
+      echo "❌ Gradle build failed with exit code $BUILD_EXIT_CODE"
+      exit $BUILD_EXIT_CODE
+    fi
+    echo "✅ Gradle build completed successfully"
+
+- name: Verify APK was created
+  run: |
+    echo "Checking for APK file..."
+    if [ -f "android/app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+      echo "✅ APK file found"
+      ls -lh android/app/build/outputs/apk/release/app-release-unsigned.apk
+    else
+      echo "❌ APK file not found"
+      echo "Listing build output directory:"
+      ls -la android/app/build/outputs/apk/release/ || echo "Release directory does not exist"
+      echo "Listing all APK files in build directory:"
+      find android/app/build/outputs -name "*.apk" -type f || echo "No APK files found"
+      exit 1
+    fi
 ```
 
 ### What This Does
@@ -117,9 +151,16 @@ Using `react-native bundle` directly would require manually specifying many Expo
 After implementing this fix, you can verify it works by:
 
 1. Checking the workflow logs for the "Generate JS bundle and assets" step
-2. Ensuring the bundle generation completes successfully
+2. Looking for the ✅ success messages after each verification step
 3. Verifying the APK artifact is uploaded to GitHub Actions
 4. Installing the APK on a device and confirming it runs without requiring a development server
+
+### Verification Steps in Workflow
+
+The workflow now includes three verification steps:
+1. **JS Bundle Verification**: Confirms the JavaScript bundle file was created and shows its size
+2. **Gradle Build Verification**: Checks the build exit code and includes stacktrace for debugging
+3. **APK Verification**: Confirms the APK file exists before attempting upload, with detailed debugging if missing
 
 ## Related Files
 
