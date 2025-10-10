@@ -3,7 +3,7 @@
 ## Issue
 The GitHub Actions workflow was showing the following warning:
 ```
-Warning: No files were found with the provided path: android/app/build/outputs/apk/release/app-release-unsigned.apk. No artifacts will be uploaded.
+Warning: No files were found with the provided path: android/app/build/outputs/apk/release/app-release.apk. No artifacts will be uploaded.
 ```
 
 This meant that the APK artifact was not being uploaded, making it impossible to download the built APK from GitHub Actions.
@@ -53,9 +53,9 @@ echo "✅ Gradle build completed successfully"
 - name: Verify APK was created
   run: |
     echo "Checking for APK file..."
-    if [ -f "android/app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+    if [ -f "android/app/build/outputs/apk/release/app-release.apk" ]; then
       echo "✅ APK file found"
-      ls -lh android/app/build/outputs/apk/release/app-release-unsigned.apk
+      ls -lh android/app/build/outputs/apk/release/app-release.apk
     else
       echo "❌ APK file not found"
       echo "Listing build output directory:"
@@ -76,7 +76,7 @@ echo "✅ Gradle build completed successfully"
   uses: actions/upload-artifact@v4
   with:
     name: app-release
-    path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+    path: android/app/build/outputs/apk/release/app-release.apk
     retention-days: 30
     if-no-files-found: error  # Fail the job if no files found
 ```

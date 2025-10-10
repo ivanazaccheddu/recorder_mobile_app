@@ -64,7 +64,7 @@ The real test is in GitHub Actions:
 3. **Download and test the APK**:
    - Scroll to the bottom of the workflow run
    - Download the `app-release` artifact
-   - Extract the ZIP to get `app-release-unsigned.apk`
+   - Extract the ZIP to get `app-release.apk`
    - Install on an Android device/emulator
    - Test basic functionality:
      - Record an audio file

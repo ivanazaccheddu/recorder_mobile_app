@@ -4,7 +4,7 @@
 
 The GitHub Actions workflow was failing with the error:
 ```
-No files were found with the provided path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+No files were found with the provided path: android/app/build/outputs/apk/release/app-release.apk
 ```
 
 This occurred because the JavaScript bundle was not being properly generated and included in the APK during the build process.
@@ -65,9 +65,9 @@ Added explicit JS bundle generation steps to the GitHub Actions workflow **befor
 - name: Verify APK was created
   run: |
     echo "Checking for APK file..."
-    if [ -f "android/app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+    if [ -f "android/app/build/outputs/apk/release/app-release.apk" ]; then
       echo "✅ APK file found"
-      ls -lh android/app/build/outputs/apk/release/app-release-unsigned.apk
+      ls -lh android/app/build/outputs/apk/release/app-release.apk
     else
       echo "❌ APK file not found"
       echo "Listing build output directory:"
@@ -117,7 +117,7 @@ cd android
 ./gradlew assembleRelease
 
 # 5. Find APK at:
-# android/app/build/outputs/apk/release/app-release-unsigned.apk
+# android/app/build/outputs/apk/release/app-release.apk
 ```
 
 **Note**: For debug builds, you can skip the bundle generation step as the app will connect to the Metro development server.
