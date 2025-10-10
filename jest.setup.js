@@ -4,6 +4,20 @@ jest.mock('expo-av', () => ({
     setAudioModeAsync: jest.fn(),
     Recording: jest.fn(),
     Sound: jest.fn(),
+    AndroidOutputFormat: {
+      MPEG_4: 2,
+    },
+    AndroidAudioEncoder: {
+      AAC: 3,
+    },
+    IOSOutputFormat: {
+      MPEG4AAC: 'aac',
+    },
+    IOSAudioQuality: {
+      LOW: 0x00,
+      MEDIUM: 0x20,
+      HIGH: 0x40,
+    },
     RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_MPEG_4: 2,
     RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AAC: 3,
     RECORDING_OPTION_IOS_OUTPUT_FORMAT_MPEG4AAC: 'aac',

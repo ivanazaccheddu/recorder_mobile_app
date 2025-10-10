@@ -1,7 +1,6 @@
 import { Audio } from 'expo-av';
 import { RecordingQuality, AudioMetering } from '../types';
 import { QUALITY_PRESETS, AUDIO_MODE } from '../constants/audioConfig';
-import { Platform } from 'react-native';
 
 export class AudioRecorderService {
   private recording: Audio.Recording | null = null;
@@ -43,11 +42,12 @@ export class AudioRecorderService {
       await this.init();
 
       const preset = QUALITY_PRESETS[quality];
-      const options = Platform.OS === 'ios' ? preset.ios : preset.android;
 
       this.recording = new Audio.Recording();
       await this.recording.prepareToRecordAsync({
-        ...options,
+        android: preset.android,
+        ios: preset.ios,
+        web: preset.web,
         isMeteringEnabled: true,
       });
       await this.recording.startAsync();
