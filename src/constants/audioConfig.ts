@@ -23,6 +23,10 @@ export const QUALITY_PRESETS: Record<RecordingQuality, any> = {
       linearPCMIsBigEndian: false,
       linearPCMIsFloat: false,
     },
+    web: {
+      mimeType: 'audio/webm',
+      bitsPerSecond: 64000,
+    },
   },
   medium: {
     android: {
@@ -44,6 +48,10 @@ export const QUALITY_PRESETS: Record<RecordingQuality, any> = {
       linearPCMIsBigEndian: false,
       linearPCMIsFloat: false,
     },
+    web: {
+      mimeType: 'audio/webm',
+      bitsPerSecond: 96000,
+    },
   },
   high: {
     android: {
@@ -64,6 +72,10 @@ export const QUALITY_PRESETS: Record<RecordingQuality, any> = {
       linearPCMBitDepth: 16,
       linearPCMIsBigEndian: false,
       linearPCMIsFloat: false,
+    },
+    web: {
+      mimeType: 'audio/webm',
+      bitsPerSecond: 128000,
     },
   },
 };
